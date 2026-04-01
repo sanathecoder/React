@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback , useEffect, useRef } from 'react'
 import './App.css'
 
 function App() {
@@ -7,6 +7,7 @@ function App() {
   const [charAllowed, setCharAllowed] = useState(false)
   const [password, setPassword] = useState("")
 
+  //  useCallback Hooks 
   const PasswordGenerator = useCallback(() => {
     let pass = ""
     let str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
@@ -15,12 +16,28 @@ function App() {
 
     for (let i = 0; i <= length; i++) {
       let char = Math.floor(Math.random() * str.length + 1)
+      pass += str.charAt(char)
     }
-  }, [length, numberAllowed, charAllowed, setPassword])
+    setPassword(pass)
+  }, [length, numberAllowed, charAllowed])
+
+  const CopyPasswordtoClipboard = useCallback(()=>{
+    passwordRef.current?.select()
+    window.navigator.clipboard.writeText(password)
+  },[password])
+//  useEffect Hook 
+  useEffect(()=>{
+    PasswordGenerator()
+  },[length,numberAllowed,charAllowed,PasswordGenerator])
+
+  // UseRef Hook 
+  const passwordRef = useRef(null)
+
+
   return (
     <>
       <div className='w-full  max-w-md py-2 mx-auto shadow-md rounded-lg px-4 my-8 text-orange-500  bg-gray-700'>
-        <h1 className='text-4xl text-center text-white'>Password Generator</h1>
+        <h1 className='text-lg text-center text-white'>Password Generator</h1>
 
         <div className='flex shadow rounded-lg overflow-hidden m-4'>
           <input
@@ -29,9 +46,11 @@ function App() {
             className='outline-none w-full py-2 bg-white px-3 rounded-l-lg'
             placeholder='Password'
             readOnly
+            ref={passwordRef}
           />
 
-          <button className='bg-blue-700 text-white px-4 py-2 rounded-r-lg hover:bg-blue-800 transition'>
+          <button className='bg-blue-700 text-white px-4 py-2 rounded-r-lg hover:bg-blue-800 transition'
+           onClick={CopyPasswordtoClipboard}>
             Copy
           </button>
 
